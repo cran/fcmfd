@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Introduction to fcmfd</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to fcmfd</h1>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The <strong>fcmfd</strong> package implements fuzzy clustering for
+ordinal Likert-type data using triangular fuzzy numbers (TFNs).</p>
+</div>
+<div id="example-dataset" class="section level1">
+<h1>Example Dataset</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">data</span>(sim_likert7)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">head</span>(sim_likert7)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt;   Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10 Q11 Q12</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; 1  2  2  3  2  2  3  2  1  2   2   2   2</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; 2  2  2  2  3  2  1  2  2  2   2   2   2</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; 3  2  1  2  2  2  3  2  2  2   2   2   2</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; 4  2  2  2  2  2  2  1  3  2   2   2   2</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; 5  2  2  2  2  2  3  2  3  1   2   2   2</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; 6  2  2  2  2  2  2  2  2  2   3   2   1</span></span></code></pre></div>
+</div>
+<div id="running-the-clustering-algorithm" class="section level1">
+<h1>Running the Clustering Algorithm</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">fcmTFN</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">data =</span> sim_likert7,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">option =</span> <span class="st">&quot;B&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">k_values =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; Running k = 2 </span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; Running k = 3 </span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; Running k = 4 </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; Running k = 5 </span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; Running k = 6</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">summary</span>(result)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; Fuzzy C-Means Clustering for TFN</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; ---------------------------------</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; Optimal number of clusters (k):  3 </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; Weights:</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; wc = 0.61997 </span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; ws = 0.38003 </span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; Iterations: 11 </span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; Scale configuration:</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; Type   : symmetric </span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; Option : B </span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt; Xie-Beni values:</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; k = 2 : 0.067732 </span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; k = 3 : 0.044298 </span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt; k = 4 : 4.477249e+14 </span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; k = 5 : 4.077275e+15 </span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt; k = 6 : 3.137093e+15</span></span></code></pre></div>
+</div>
+<div id="cluster-assignment" class="section level1">
+<h1>Cluster Assignment</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">cluster_assignment</span>(result)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">table</span>(clusters)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; clusters</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;   1   2   3 </span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 100 100 100</span></span></code></pre></div>
+</div>
+<div id="prototype-interpretation" class="section level1">
+<h1>Prototype Interpretation</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">prototype_matrix</span>(result)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt;         Cluster_1 Cluster_2 Cluster_3</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Var1_l   3.007430  1.080729  4.969121</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; Var1_c   3.061097  1.133164  5.060103</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; Var1_r   2.970013  1.140116  5.059868</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; Var2_l   3.007920  1.080556  5.029623</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Var2_c   3.061827  1.102351  4.957240</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; Var2_r   3.006383  1.112967  4.945130</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; Var3_l   2.972091  1.110017  5.017653</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; Var3_c   3.027725  1.102007  5.028846</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; Var3_r   2.992749  1.093108  4.988776</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Var4_l   3.006059  1.071020  4.989099</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; Var4_c   3.005318  1.113128  4.993825</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; Var4_r   2.970551  1.152167  4.984855</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; Var5_l   4.007277  2.021546  5.969110</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; Var5_c   4.060629  2.038220  6.060074</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; Var5_r   3.969568  2.023083  6.059839</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; Var6_l   4.007553  1.952083  6.029599</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; Var6_c   4.061397  1.975648  5.957210</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; Var6_r   4.005926  1.997163  5.945100</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; Var7_l   3.971919  2.040613  6.017642</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; Var7_c   4.027324  1.932746  6.028818</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt; Var7_r   3.992573  2.034464  5.988764</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; Var8_l   4.005667  1.995309  5.989075</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt; Var8_c   4.005073  2.045521  5.993807</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; Var8_r   3.970209  2.044463  5.984830</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt; Var9_l   5.006898  3.021520  6.850721</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; Var9_c   5.060260  3.038197  6.930289</span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; Var9_r   4.969161  3.023056  6.911577</span></span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a><span class="co">#&gt; Var10_l  5.007289  2.952065  6.909242</span></span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a><span class="co">#&gt; Var10_c  5.061273  2.975639  6.918142</span></span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a><span class="co">#&gt; Var10_r  5.005549  2.997138  6.858979</span></span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a><span class="co">#&gt; Var11_l  4.971420  3.040580  6.881060</span></span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a><span class="co">#&gt; Var11_c  5.027004  2.932725  6.929930</span></span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a><span class="co">#&gt; Var11_r  4.992176  3.034437  6.880635</span></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="co">#&gt; Var12_l  5.005315  2.995286  6.890936</span></span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="co">#&gt; Var12_c  5.004601  3.045489  6.898119</span></span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a><span class="co">#&gt; Var12_r  4.969811  3.044437  6.887700</span></span></code></pre></div>
+</div>
+<div id="xie-beni-index-visualization" class="section level1">
+<h1>Xie-Beni Index Visualization</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">plot_xb</span>(result)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>This vignette demonstrated the basic workflow for fuzzy clustering of
+Likert-type data using the <strong>fcmfd</strong> package.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
