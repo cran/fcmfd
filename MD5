@@ -1,4 +1,4 @@
-4f659484ef3e6ed18659d56c14e97fe4 *DESCRIPTION
+c925e6b9e99ffd5983594d6197aab174 *DESCRIPTION
 da7a31ea19d34a28ba0a35f3399b8d22 *LICENSE
 10949997933520b68fbadac464dc0904 *NAMESPACE
 98e70d507b244d4b311a65b583f51790 *NEWS.md
@@ -13,7 +13,7 @@ ae9c3976357537b4055ba544ad7a9bd9 *R/compute_weights.R
 debcf1913a5d00669418551596d589ba *R/data_sim_likert7.R
 97108dacf9f055c70359683af3b2dcdd *R/data_sim_likert_0_10.R
 242c3f75330bbcf9dd5206d8c7113c93 *R/default_symmetric_dictionary.R
-177e45e62d128ea2cac12ff9cfe12ac4 *R/fcmTFN.R
+51d3002eaf51e1e71f10a065e70d2a42 *R/fcmTFN.R
 4cdf8ca9210f2a794d8a2f2ccb4d31dc *R/fkm_f_algorithm.R
 900bf357bd72d30c45760699c3cf0e16 *R/fuzzy_distance.R
 df793fe272f30fb0528bca13543a788d *R/initialize_U.R
@@ -47,7 +47,7 @@ b6a08007f35f9d6fe56f2f4ebb69f73c *man/cluster_assignment.Rd
 b561e6f8e1e4e53bf8d30b87cc109aaa *man/convert_matrix_to_list.Rd
 0c4b2d39e0903b2618ab0b90232d9bc5 *man/convert_to_tfn.Rd
 d45f9361ec6a511d6534bd85addc2a79 *man/default_symmetric_dictionary.Rd
-f1f18bc64403c6b1f547363fab26db33 *man/fcmTFN.Rd
+2cafb9f37728658ac6f0c96570b5f6d9 *man/fcmTFN.Rd
 e13331cb31790116ee9200e379d84eb1 *man/fkm_f_algorithm.Rd
 b66e2c0416052826599b3df6fafec1d4 *man/fuzzy_distance.Rd
 f68f176cf1360da7f0f9e8e564b1183f *man/initialize_U.Rd
