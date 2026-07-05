@@ -1,21 +1,31 @@
-#' Prototype Matrix Extraction
+#' Prototype Results
 #'
-#' Returns cluster prototypes as a readable matrix
-#' containing l, c, r values for each variable.
+#' Returns cluster prototypes either as a flat matrix
+#' or as a list of tables containing l, c, r values
+#' for each variable.
 #'
 #' @param object An object of class "fcmTFN".
 #' @param use_var_names Logical.
 #' @param var_names Optional variable names.
+#' @param format Character string indicating the output format:
+#'   "flat" (default) returns the original matrix representation,
+#'   while "table" returns one table per cluster.
 #'
-#' @return A data.frame containing prototype values.
+#' @return
+#' If format = "flat", a data.frame containing prototype values.
+#'
+#' If format = "table", a named list of data.frames, one for each cluster.
 #'
 #' @export
 
-prototype_matrix <- function(
+prototype_results <- function(
     object,
     use_var_names = FALSE,
-    var_names = NULL
+    var_names = NULL,
+    format = c("flat", "table")
 ) {
+
+  format <- match.arg(format)
 
   # --------------------------------
   # Validate object
@@ -73,7 +83,7 @@ prototype_matrix <- function(
   }
 
   # --------------------------------
-  # Create matrix
+  # Flat format (original behavior)
   # --------------------------------
 
   proto_mat <- matrix(
@@ -98,7 +108,6 @@ prototype_matrix <- function(
 
     }
 
-    # ✔ CORRECCIÓN AQUÍ
     proto_mat[, g] <- as.vector(proto)
 
   }
@@ -107,10 +116,6 @@ prototype_matrix <- function(
     "Cluster_",
     seq_len(k)
   )
-
-  # --------------------------------
-  # Row names
-  # --------------------------------
 
   row_names <- character(p * 3)
 
@@ -129,11 +134,55 @@ prototype_matrix <- function(
   rownames(proto_mat) <- row_names
 
   # --------------------------------
-  # Return as data.frame
+  # Return flat format
   # --------------------------------
 
-  proto_df <- as.data.frame(proto_mat)
+  if (format == "flat") {
 
-  return(proto_df)
+    return(
+      round(
+        as.data.frame(proto_mat),
+        digits = 3
+      )
+    )
+
+  }
+
+  # --------------------------------
+  # Return table format
+  # --------------------------------
+
+  proto_tables <- vector(
+    mode = "list",
+    length = k
+  )
+
+  for (g in seq_len(k)) {
+
+    proto_table <- round(
+      as.data.frame(
+        prototypes[[g]]
+      ),
+      digits = 3
+    )
+
+    colnames(proto_table) <- c(
+      "l",
+      "c",
+      "r"
+    )
+
+    rownames(proto_table) <- var_names
+
+    proto_tables[[g]] <- proto_table
+
+  }
+
+  names(proto_tables) <- paste0(
+    "Cluster_",
+    seq_len(k)
+  )
+
+  return(proto_tables)
 
 }
